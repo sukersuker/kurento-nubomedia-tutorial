@@ -47,4 +47,8 @@
 		</developer>
 	</developers>
 
+	<modules>
+		<module>nubomedia-magic-mirror</module>
+	</modules>
+
 </project>
