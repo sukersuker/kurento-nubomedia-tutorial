@@ -31,8 +31,6 @@ import org.springframework.web.socket.config.annotation.WebSocketHandlerRegistry
 @EnableWebSocket
 public class MagicMirrorApp implements WebSocketConfigurer {
 
-  static final String DEFAULT_APP_SERVER_URL = "https://localhost:8443";
-
   @Bean
   public MagicMirrorHandler handler() {
     return new MagicMirrorHandler();
