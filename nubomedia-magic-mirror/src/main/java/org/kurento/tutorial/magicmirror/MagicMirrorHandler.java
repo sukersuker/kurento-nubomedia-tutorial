@@ -57,10 +57,7 @@ public class MagicMirrorHandler extends TextWebSocketHandler {
       start(session, jsonMessage);
       break;
     case "stop": {
-      UserSession user = users.remove(session.getId());
-      if (user != null) {
-        user.release();
-      }
+      release(session);
       break;
     }
     case "onIceCandidate": {
@@ -72,7 +69,7 @@ public class MagicMirrorHandler extends TextWebSocketHandler {
       break;
     }
     default:
-      sendError(session, "Invalid message with id " + jsonMessage.get("id").getAsString());
+      error(session, "Invalid message with id " + jsonMessage.get("id").getAsString());
       break;
     }
   }
@@ -126,18 +123,29 @@ public class MagicMirrorHandler extends TextWebSocketHandler {
       webRtcEndpoint.gatherCandidates();
 
     } catch (Throwable t) {
-      sendError(session, t.getMessage());
+      error(session, t.getMessage());
     }
   }
 
-  private void sendError(WebSocketSession session, String message) {
+  private void error(WebSocketSession session, String message) {
     try {
+      // 1. Send error message to client
       JsonObject response = new JsonObject();
       response.addProperty("id", "error");
       response.addProperty("message", message);
       session.sendMessage(new TextMessage(response.toString()));
+
+      // 2. Release media session
+      release(session);
     } catch (IOException e) {
       log.error("Exception sending message", e);
+    }
+  }
+
+  private void release(WebSocketSession session) {
+    UserSession user = users.remove(session.getId());
+    if (user != null) {
+      user.release();
     }
   }
 }
