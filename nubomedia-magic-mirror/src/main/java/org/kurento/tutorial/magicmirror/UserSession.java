@@ -18,6 +18,8 @@ import org.kurento.client.IceCandidate;
 import org.kurento.client.KurentoClient;
 import org.kurento.client.MediaPipeline;
 import org.kurento.client.WebRtcEndpoint;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.gson.JsonObject;
 
@@ -28,13 +30,20 @@ import com.google.gson.JsonObject;
  * @since 6.2.2
  */
 public class UserSession {
+
+  private final Logger log = LoggerFactory.getLogger(UserSession.class);
+
   private WebRtcEndpoint webRtcEndpoint;
   private MediaPipeline mediaPipeline;
   private KurentoClient kurentoClient;
 
   public UserSession() {
     kurentoClient = KurentoClient.create();
+    log.info("Created kurentoClient {} ", getKurentoClient().getSessionId());
+
     mediaPipeline = getKurentoClient().createMediaPipeline();
+    log.info("Created Media Pipeline {} ", getMediaPipeline().getId());
+
     webRtcEndpoint = new WebRtcEndpoint.Builder(getMediaPipeline()).build();
   }
 
@@ -61,7 +70,9 @@ public class UserSession {
   }
 
   public void release() {
+    log.info("Releasing media pipeline {} ", getMediaPipeline().getId());
     getMediaPipeline().release();
+    log.info("Destroying kurentoClient {} ", getKurentoClient().getSessionId());
     getKurentoClient().destroy();
   }
 }
