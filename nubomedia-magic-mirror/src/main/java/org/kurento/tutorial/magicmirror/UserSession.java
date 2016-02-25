@@ -23,6 +23,8 @@ import org.slf4j.LoggerFactory;
 
 import com.google.gson.JsonObject;
 
+import de.fhg.fokus.nubomedia.kmc.KmsUrlProvider;
+
 /**
  * User session.
  * 
@@ -36,13 +38,21 @@ public class UserSession {
   private WebRtcEndpoint webRtcEndpoint;
   private MediaPipeline mediaPipeline;
   private KurentoClient kurentoClient;
+  private String sessionId;
+  private KmsUrlProvider kmsUrlProvider;
+  private String kmsUrl;
 
-  public UserSession() {
-    kurentoClient = KurentoClient.create();
-    log.info("Created kurentoClient {} ", getKurentoClient().getSessionId());
+  public UserSession(String sessionId) {
+    this.sessionId = sessionId;
+    kmsUrlProvider = new KmsUrlProvider();
+    int numPoints = 50;
+    kmsUrl = kmsUrlProvider.reserveKms(getSessionId(), numPoints);
+    log.info("Reserved {} points for KMS {} (session {})", numPoints, kmsUrl, sessionId);
+    kurentoClient = KurentoClient.create(kmsUrl);
+    log.info("Created kurentoClient {} (session {})", getKurentoClient().getSessionId(), sessionId);
 
     mediaPipeline = getKurentoClient().createMediaPipeline();
-    log.info("Created Media Pipeline {} ", getMediaPipeline().getId());
+    log.info("Created Media Pipeline {} (session {})", getMediaPipeline().getId(), sessionId);
 
     webRtcEndpoint = new WebRtcEndpoint.Builder(getMediaPipeline()).build();
   }
@@ -70,9 +80,15 @@ public class UserSession {
   }
 
   public void release() {
-    log.info("Releasing media pipeline {} ", getMediaPipeline().getId());
+    log.info("Releasing KMS (URL {})", kmsUrl);
+    kmsUrlProvider.releaseKms(getSessionId());
+    log.info("Releasing media pipeline {} (session {})", getMediaPipeline().getId(), sessionId);
     getMediaPipeline().release();
-    log.info("Destroying kurentoClient {} ", getKurentoClient().getSessionId());
+    log.info("Destroying kurentoClient {} (session {})", getKurentoClient().getSessionId(), sessionId);
     getKurentoClient().destroy();
+  }
+
+  public String getSessionId() {
+    return sessionId;
   }
 }

@@ -77,8 +77,9 @@ public class MagicMirrorHandler extends TextWebSocketHandler {
   private void start(final WebSocketSession session, JsonObject jsonMessage) {
     try {
       // User session
-      UserSession user = new UserSession();
-      users.put(session.getId(), user);
+      String sessionId = session.getId();
+      UserSession user = new UserSession(sessionId);
+      users.put(sessionId, user);
       WebRtcEndpoint webRtcEndpoint = user.getWebRtcEndpoint();
 
       // ICE candidates
