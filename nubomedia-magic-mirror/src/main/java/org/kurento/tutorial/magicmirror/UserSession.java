@@ -23,8 +23,6 @@ import org.slf4j.LoggerFactory;
 
 import com.google.gson.JsonObject;
 
-import de.fhg.fokus.nubomedia.kmc.KmsUrlProvider;
-
 /**
  * User session.
  * 
@@ -39,16 +37,10 @@ public class UserSession {
   private MediaPipeline mediaPipeline;
   private KurentoClient kurentoClient;
   private String sessionId;
-  private KmsUrlProvider kmsUrlProvider;
-  private String kmsUrl;
 
   public UserSession(String sessionId) {
     this.sessionId = sessionId;
-    kmsUrlProvider = new KmsUrlProvider();
-    int numPoints = 50;
-    kmsUrl = kmsUrlProvider.reserveKms(getSessionId(), numPoints);
-    log.info("Reserved {} points for KMS {} (session {})", numPoints, kmsUrl, sessionId);
-    kurentoClient = KurentoClient.create(kmsUrl);
+    kurentoClient = KurentoClient.create();
     log.info("Created kurentoClient {} (session {})", getKurentoClient().getSessionId(), sessionId);
 
     mediaPipeline = getKurentoClient().createMediaPipeline();
@@ -80,8 +72,6 @@ public class UserSession {
   }
 
   public void release() {
-    log.info("Releasing KMS (URL {})", kmsUrl);
-    kmsUrlProvider.releaseKms(getSessionId());
     log.info("Releasing media pipeline {} (session {})", getMediaPipeline().getId(), sessionId);
     getMediaPipeline().release();
     log.info("Destroying kurentoClient {} (session {})", getKurentoClient().getSessionId(), sessionId);
