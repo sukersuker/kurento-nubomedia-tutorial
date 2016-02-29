@@ -4,7 +4,7 @@
 
 	<parent>
 		<groupId>org.kurento.tutorial</groupId>
-		<artifactId>kurento-tutorial</artifactId>
+		<artifactId>kurento-nubomedia-tutorial</artifactId>
 		<version>6.2.2-SNAPSHOT</version>
 	</parent>
 
