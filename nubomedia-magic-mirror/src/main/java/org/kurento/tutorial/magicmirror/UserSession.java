@@ -72,10 +72,14 @@ public class UserSession {
   }
 
   public void release() {
-    log.info("Releasing media pipeline {} (session {})", getMediaPipeline().getId(), sessionId);
-    getMediaPipeline().release();
-    log.info("Destroying kurentoClient {} (session {})", getKurentoClient().getSessionId(), sessionId);
-    getKurentoClient().destroy();
+    try {
+      log.info("Releasing media pipeline {} ", getMediaPipeline().getId());
+      getMediaPipeline().release();
+      log.info("Destroying kurentoClient {} ", getKurentoClient().getSessionId());
+      getKurentoClient().destroy();
+    } catch (Throwable e) {
+      log.error(">>> Exception releasing session", e);
+    }
   }
 
   public String getSessionId() {
