@@ -126,7 +126,7 @@ public class MagicMirrorHandler extends TextWebSocketHandler {
 
     } catch (Throwable t) {
       log.error("Exception starting session", t);
-      error(session, t.getMessage());
+      error(session, t.getClass().getSimpleName() + ": " + t.getMessage());
     }
   }
 
