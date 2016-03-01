@@ -48,6 +48,7 @@ ws.onmessage = function(message) {
 			setState(I_CAN_START);
 		}
 		onError("Error message from server: " + parsedMessage.message);
+		stop(false);
 		break;
 	case 'iceCandidate':
 		webRtcPeer.addIceCandidate(parsedMessage.candidate, function(error) {
@@ -122,17 +123,19 @@ function startResponse(message) {
 	});
 }
 
-function stop() {
+function stop(stopMessage) {
 	console.log("Stopping video call ...");
 	setState(I_CAN_START);
 	if (webRtcPeer) {
 		webRtcPeer.dispose();
 		webRtcPeer = null;
 
-		var message = {
-			id : 'stop'
+		if (stopMessage == undefined || stopMessage) {
+		    var message = {
+			    id : 'stop'
+		    }
+		    sendMessage(message);
 		}
-		sendMessage(message);
 	}
 	hideSpinner(videoInput, videoOutput);
 }
