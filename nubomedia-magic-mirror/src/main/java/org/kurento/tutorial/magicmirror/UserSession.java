@@ -18,7 +18,6 @@ import org.kurento.client.IceCandidate;
 import org.kurento.client.KurentoClient;
 import org.kurento.client.MediaPipeline;
 import org.kurento.client.WebRtcEndpoint;
-import org.kurento.client.internal.NotEnoughResourcesException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -42,14 +41,6 @@ public class UserSession {
   public UserSession(String sessionId) {
     this.sessionId = sessionId;
     kurentoClient = KurentoClient.create();
-
-    log.debug("kurentoClient {}", kurentoClient);
-
-    // TODO this exception should be raised by nubomedia-media-client
-    if (kurentoClient == null) {
-      throw new NotEnoughResourcesException("Not enough resources (kurentoClient is null)");
-    }
-
     log.info("Created kurentoClient (session {})", sessionId);
 
     mediaPipeline = getKurentoClient().createMediaPipeline();

@@ -125,6 +125,7 @@ public class MagicMirrorHandler extends TextWebSocketHandler {
       webRtcEndpoint.gatherCandidates();
 
     } catch (Throwable t) {
+      log.error("Exception starting session", t);
       error(session, t.getMessage());
     }
   }
