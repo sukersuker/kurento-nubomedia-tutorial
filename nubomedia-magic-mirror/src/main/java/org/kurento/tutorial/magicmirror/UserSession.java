@@ -18,6 +18,7 @@ import org.kurento.client.IceCandidate;
 import org.kurento.client.KurentoClient;
 import org.kurento.client.MediaPipeline;
 import org.kurento.client.WebRtcEndpoint;
+import org.kurento.client.internal.NotEnoughResourcesException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -41,7 +42,15 @@ public class UserSession {
   public UserSession(String sessionId) {
     this.sessionId = sessionId;
     kurentoClient = KurentoClient.create();
-    log.info("Created kurentoClient {} (session {})", getKurentoClient().getSessionId(), sessionId);
+
+    log.debug("kurentoClient {}", kurentoClient);
+
+    // TODO this exception should be raised by nubomedia-media-client
+    if (kurentoClient == null) {
+      throw new NotEnoughResourcesException("Not enough resources (kurentoClient is null)");
+    }
+
+    log.info("Created kurentoClient (session {})", sessionId);
 
     mediaPipeline = getKurentoClient().createMediaPipeline();
     log.info("Created Media Pipeline {} (session {})", getMediaPipeline().getId(), sessionId);
@@ -72,14 +81,10 @@ public class UserSession {
   }
 
   public void release() {
-    try {
-      log.info("Releasing media pipeline {} ", getMediaPipeline().getId());
-      getMediaPipeline().release();
-      log.info("Destroying kurentoClient {} ", getKurentoClient().getSessionId());
-      getKurentoClient().destroy();
-    } catch (Throwable e) {
-      log.error(">>> Exception releasing session", e);
-    }
+    log.info("Releasing media pipeline {} (session {})", getMediaPipeline().getId(), sessionId);
+    getMediaPipeline().release();
+    log.info("Destroying kurentoClient (session {})", sessionId);
+    getKurentoClient().destroy();
   }
 
   public String getSessionId() {
